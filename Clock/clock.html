@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时钟效果</title>
+    <style>
+        body {
+            font: 100 0 "优先标题黑";
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            background-image: linear-gradient(to right, #b8cbb8 0%,
+            #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%);
+        }
+        /* 设置时钟样式  */
+        #clock {
+            font-size: 24px;
+            width: 350px;
+            height: 350px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -175px;
+            margin-top: -175px;
+        }
+        /* 设置时钟中数字组成样式 */  
+        .digit-group {
+            display: inline-block;
+            height: 350px;
+        }
+        .digit-group:not(:last-child)::after {
+            content: ":";
+            font-size: 72px;
+        }
+        .digit {
+            display: inline-block;
+            width: 50px;
+            height: 350px;
+        }
+        .digit .digit-number {
+            color: rgba(255, 255, 255, 0.5);
+            transform: rotate(-90deg);
+            transition: font-size 200ms, transform 350ms, color 150ms;
+        }
+        /* 设置亮数字的样式 */ 
+        .digit .digit-number.bright {
+            color: inherit;
+            font-size: 72px;
+            transform: rotate(0deg);
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 创建一个包含10个元素的数组，每个元素的值为索引 
+        let _time10 = Array.from(Array(10)).map((n, i) => i);
+        // 创建一个包含6个元素的数组，作为时间的小时和分钟 
+        let _time6 = _time10.slice(0, 6);
+        // 创建一个包含3个元素的数组，作为时间的秒数 
+        let _time3 = _time10.slice(0, 3);
+        // 创建一个包含3个数组的二维数组，用于表示时钟结构 
+        let _Structure = [
+            [_time3, _time10],
+            [_time6, _time10],
+            [_time6, _time10]
+        ];
+        // 创建一个div元素作为时间的容器，并设置id为“clock” 
+        let clock = document.createElement('div');
+        clock.id = 'clock';
+        // 将时钟容器添加到元素中
+        document.body.appendChild(clock);
+        // 创建一个数组用于存储每个数字组的div元素
+        let digitGroups = [];
+        //请求动画帧并调用update函数
+        requestAnimationFrame(update);
+        // 遍历_Structure数组
+        _Structure.forEach(digits => {
+            // 创建一个div元素作为数字组的容器,并添加类名'digit-group'
+            let digitGroup = document.createElement('div');
+            digitGroup.classList.add('digit-group');
+            // 将数字组的div元素添加到时钟容器中，并将其添加到dightGroups数组中
+            clock.appendChild(digitGroup);
+            digitGroups.push(digitGroup);
+            // 遍历数组中的每个元素
+            digits.forEach(digitList => {
+                // 创建一个div元素作为数字的容器,并添加类名'digit'
+                let digit = document.createElement('div');
+                digit.classList.add('digit');
+                // 遍历数组中的每个元素
+                digitList.forEach(n => {
+                    // 创建一个div元素作为数字的容器
+                    let ele = document.createElement('div');
+                    ele.classList.add('digit-number');
+                    ele.innerText = n;
+                    // 将数字的div元素添加到数字组的容器中
+                    digit.appendChild(ele);
+            });
+            // 将数字的div元素添加到数字组的容器中
+            digitGroup.appendChild(digit);
+        });
+    });
+    // 定义一个update函数
+    function update() {
+        // 请求动画帧并调用update函数
+        requestAnimationFrame(update);
+        // 创建一个Data对象表示当前时间
+        let date = new Date();
+        // 获取当前时间的小时、分钟和秒数，并转换为两位数字符串数组
+        let time = [date.getHours(), date.getMinutes(), date.getSeconds()].
+        map(n => `0${n}`.slice(-2).split('').map(e => +e)).
+        reduce((p, n) => p.concat(n), []);
+        // 遍历time数组
+        time.forEach((n, i) => {
+            let digit = digitGroups[Math.floor(i * 0.5)].children[i % 2].children;
+            // 遍历数字组的子元素
+            Array.from(digit).forEach((e, i2) => e.classList[i2 === n ? 'add' : 'remove']('bright'));
+        });
+    }
+    </script>
+</body>
+</html>
